@@ -1,12 +1,18 @@
 import 'dart:convert';
 
+import 'package:api_flutter/personagens/teladetalhespersonagens.dart';
 import 'package:flutter/material.dart';
 import 'package:api_flutter/model/personagem.dart';
 import 'package:http/http.dart' as http;
 
-class Telalistapersonagens extends StatelessWidget {
+class Telalistapersonagens extends StatefulWidget {
   const Telalistapersonagens({super.key});
 
+  @override
+  State<Telalistapersonagens> createState() => _TelalistapersonagensState();
+}
+
+class _TelalistapersonagensState extends State<Telalistapersonagens> {
   Future<List<Personagem>> pageData() async {
     final response = await http.Client()
         .get(Uri.parse('https://rickandmortyapi.com/api/character'));
@@ -22,7 +28,7 @@ class Telalistapersonagens extends StatelessWidget {
           name: personagem['name'],
           status: personagem['status'],
           created: personagem['created'],
-          episodes: [],
+          episodes: personagem['episode'].cast<String>(),
           gender: personagem['gender'],
           image: personagem['image'],
           species: personagem['species'],
@@ -47,15 +53,44 @@ class Telalistapersonagens extends StatelessWidget {
         future: pageData(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return (Text('Não há dados para exibir'));
+            return Center(child: CircularProgressIndicator());
           } else {
             List<Personagem> listaPersonagens =
                 snapshot.data as List<Personagem>;
             return ListView.builder(
               itemCount: listaPersonagens.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(listaPersonagens[index].name.toString()),
+                return GestureDetector(
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => TelaDetalhesPersonagem(
+                                personagemData: listaPersonagens[index],
+                              ))),
+                  child: Card(
+                    child: ListTile(
+                      leading: CircleAvatar(
+                          backgroundImage:
+                              NetworkImage(listaPersonagens[index].image)),
+                      title: Text(
+                        listaPersonagens[index].name.toString(),
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle:
+                          Text('Espécie: ${listaPersonagens[index].species}'),
+                      trailing: listaPersonagens[index].status == 'Alive'
+                          ? Icon(
+                              Icons.circle,
+                              color: Color.fromARGB(255, 17, 255, 0),
+                            )
+                          : listaPersonagens[index].status == "Dead"
+                              ? Icon(
+                                  Icons.circle,
+                                  color: const Color.fromARGB(255, 255, 0, 0),
+                                )
+                              : Icon(Icons.question_mark),
+                    ),
+                  ),
                 );
               },
             );

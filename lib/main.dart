@@ -5,6 +5,7 @@ import 'personagens/telalistapersonagens.dart';
 
 void main() {
   runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
     title: "Aplicativo do Rick & Morty",
     home: Home(),
     theme: ThemeData(
@@ -70,7 +71,7 @@ class Home extends StatelessWidget {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => Telalistalocais(),
+                        builder: (context) => Telalistaepisodios(),
                       ));
                 },
                 child: Column(children: [
